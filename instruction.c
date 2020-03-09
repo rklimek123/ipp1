@@ -2,8 +2,8 @@
 #include "alloc.h"
 #include "stringops.h"
 
-const int EOF = -2;
-const int ERROR = -1;
+const int ERROR = -2;
+const int EOF = -1;
 const int IGNORE = 0;
 const int ADD = 1;
 const int CHECK = 2;
@@ -15,7 +15,7 @@ struct Instruction {
     char **forest;
     char **tree;
     char **animal;
-}
+};
 
 typedef struct Instruction* InstructionPtr;
 
@@ -127,7 +127,7 @@ InstructionPtr parseInstruction() {
     //returns error if there are still some signs in a line
     if (*instructionStr != '\n'){
         free(*currentLine);
-        free(*forest);
+        free(*forest);//tutaj przypisuje adres gdzies tam a potem usuwam stad lol? moze lepiej jakies kopie? jest chyba na to jakiś modulik. Valgrind poleca
         free(*tree);
         free(*animal);
         return blankInstruction(ERROR);

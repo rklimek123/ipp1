@@ -24,15 +24,19 @@ Tree createTree(char** value, Tree corresponding, Tree left, Tree right) {
     return n;
 }
 
-void insert(Tree *treePtr, char **x) {
+Tree *insert(Tree *treePtr, char **x) {
     if (*treePtr == NULL) {
         *treePtr = createTree(x, NULL, NULL, NULL);
+        return treePtr;
     }
     else if (strcmp(*(*treePtr)->value, *x) < 0) {
-        insert(&((*treePtr)->right), x);
+        return insert(&((*treePtr)->right), x); //krzaczy jak poddrzewo to NULL
     }
     else if (strcmp(*(*treePtr)->value, *x) > 0) {
-        insert(&((*treePtr)->left), x);
+        return insert(&((*treePtr)->left), x);
+    }
+    else {
+        return treePtr;
     }
 }
 
@@ -109,9 +113,9 @@ void printTree(Tree t) {
     }
 }
 
-Tree findTree(Tree t, char *value) {
+Tree *findTree(Tree t, char *value) {
     if (t == NULL) {
-        return NULL
+        return NULL;
     }
 
     if (strcmp(*(t->value), value) < 0) {
@@ -121,7 +125,7 @@ Tree findTree(Tree t, char *value) {
         return findTree(t->left, value);
     }
     
-    return t;
+    return &t;
 }
 
 int main() {

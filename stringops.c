@@ -1,10 +1,11 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include "alloc.h"
 
 //Checks if a character is a whitespace.
 bool isWhitespace(char a) {
-    a == '' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
+    a == ' ' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
 }
 
 //Checks if a character is a letter.
@@ -43,7 +44,7 @@ char *removeWord(char *baseStr, char **removedWordLocation) {
     allocateAndValidateStr(&removedWord, maxWordLength);
 
     while (isLetter(*baseStr)) {
-        addChar(removedWord, &removedWordLength, &maxWordLength, **baseStr)
+        addChar(removedWord, &removedWordLength, &maxWordLength, *baseStr);
         baseStr++;
     }
 

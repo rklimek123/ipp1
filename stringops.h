@@ -1,6 +1,10 @@
 #ifndef STRINGOPS_H
 #define STRINGOPS_H
 
+#ifndef _STDBOOL_H
+    #include <stdbool.h>
+#endif
+
 #ifndef _STDLIB_H
     #include <stdlib.h>
 #endif
