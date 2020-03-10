@@ -1,9 +1,10 @@
 #include <stdlib.h>
+#include "alloc.h"
 
 //Validates if memory has been successfully allocated to a pointer.
 void validateAlloc(void *ptr) {
     if (ptr == NULL) {
-        perror("Blad alokacji pamieci\n");
+        perror("Błąd alokacji pamięci\n");
         exit(1);
     }
 }
@@ -18,8 +19,4 @@ void allocateAndValidateStr(char **baseStr, int targetLength) {
 void reallocateAndValidateStr(char **baseStr, int targetLength) {
     *baseStr = (char *)realloc(*baseStr, targetLength * sizeof(char));
     validateAlloc(*baseStr);
-}
-
-int main() {
-    return 0;
 }

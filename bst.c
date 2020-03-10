@@ -1,22 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "alloc.h"
-
-struct Node;
-
-typedef struct Node* Tree;
-
-struct Node {
-    char **value;
-    Tree corresponding; //for making "Tree of Trees" like structures
-    Tree left, right;
-};
+#include "alloc.h"
+#include "bst.h"
 
 Tree createTree(char** value, Tree corresponding, Tree left, Tree right) {
     Tree n;
     n = (Tree)malloc(sizeof(struct Node));
-    //validateAlloc(n);
+    validateAlloc(n);
     n->value = value;
     n->corresponding = corresponding;
     n->left = left;
@@ -50,14 +41,14 @@ void removeTree(Tree t) {
     }
 }
 
-void removeValueAndCorresponding(Tree *t) {
+static void removeValueAndCorresponding(Tree *t) {
     if (*t != NULL) {
         removeTree((*t)->corresponding);
         free(*((*t)->value));
     }
 }
 
-Tree *removeMin(Tree *treePtr) {
+static Tree *removeMin(Tree *treePtr) {
     if (*treePtr == NULL) {
         return NULL;
     }
@@ -126,45 +117,4 @@ Tree *findTree(Tree t, char *value) {
     }
     
     return &t;
-}
-
-int main() {
-    // char *buffer;
-    // size_t bufferSize = 1;
-    // buffer = (char *)malloc(bufferSize * sizeof(char));
-    // int cabbage = getline(&buffer,&bufferSize, stdin);
-
-    // char *senor = "ñ";
-    // printf("%d-%d-%d\n", 'a', senor[0], senor[1]);
-    // printf("%d", strcmp("a", "ñ"));
-
-    // Tree mytree;
-    // char *aab;
-    // char *abba;
-    // char *aaa;
-    // aab = (char *)malloc(sizeof(char) * 3);
-    // abba = (char *)malloc(sizeof(char) * 4);
-    // aaa = (char *)malloc(sizeof(char) * 3);
-    // *aab = 'a';
-    // *(aab + 1) = 'a';
-    // *(aab + 2) = 'b';
-    // *abba = 'a';
-    // *(abba + 1) = 'b';
-    // *(abba + 2) = 'b';
-    // *(abba + 3) = 'a';
-    // *aaa = 'a';
-    // *(aaa + 1) = 'a';
-    // *(aaa + 2) = 'a';
-    // mytree = createTree(&aab, NULL, NULL, NULL);
-    // insert(&mytree, &abba);
-    // insert(&mytree, &aaa);
-    // removeElement(&mytree, aab);
-    // printAll(mytree);
-    // printf("fuk");
-    // removeTree(mytree);
-    // free(aab);
-    // free(abba);
-    // free(aaa);
-
-    return 0;
 }

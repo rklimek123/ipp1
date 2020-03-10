@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "alloc.h"
+#include "stringops.h"
 
 //Checks if a character is a whitespace.
-bool isWhitespace(char a) {
+static bool isWhitespace(char a) {
     a == ' ' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
 }
 
 //Checks if a character is a letter.
-bool isLetter(char a) {
+static bool isLetter(char a) {
     a > 32 || a < 0;
 }
 
@@ -23,7 +24,7 @@ char *removeWhitespaces(char *baseStr) {
 }
 
 //Adds a char to a string;
-void addChar(char **targetStr, unsigned long long *targetStrLength,
+static void addChar(char **targetStr, unsigned long long *targetStrLength,
              unsigned long long *maxLength, char addedChar) {
     if (*targetStrLength + 1 == *maxLength) {
         *maxLength *= 2;
@@ -76,8 +77,4 @@ char **readLine() {
     }
 
     return &buffer;
-}
-
-int main() {
-    return 0;
 }

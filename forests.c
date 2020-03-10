@@ -38,7 +38,7 @@ void addCommand(Tree *targetTree, struct Instruction instruction) {
         return;
     }
 
-    Tree *addThere;
+    Tree *addThere = NULL;
     *addThere = NULL;
 
     addThere = insert(targetTree, instruction.forest);
@@ -76,34 +76,34 @@ bool validateCheck(struct Instruction instruction) {
     return true;
 }
 
-const int FOREST = 0;
-const int TREE = 1;
+#define FOREST 0
+#define TREE 1
 
-bool checkInAny(Tree *targetTree, struct Instruction instruction, int level) {
-    if (*targetTree = NULL) {
+bool checkInAny(Tree targetTree, struct Instruction instruction, int level) {
+    if (targetTree == NULL) {
         return false;
     }
 
     if (level == FOREST) {
         if (strcmp(*(instruction.tree), "*") == 0) {
-            if (checkInAny((*targetTree)->corresponding, instruction, TREE)) {
+            if (checkInAny(targetTree->corresponding, instruction, TREE)) {
                 return true;
             }
         }
         else {
-            if (*findTree((*targetTree)->corresponding, *(instruction.tree)) != NULL) {
+            if (*findTree(targetTree->corresponding, *(instruction.tree)) != NULL) {
                 return true;
             }
         }
     }
     else { //if (level == TREE)
-        if (*findTree((*targetTree)->corresponding, *(instruction.animal)) != NULL) {
+        if (*findTree(targetTree->corresponding, *(instruction.animal)) != NULL) {
             return true;
         }
     }
 
-    return checkForAll((*targetTree)->left, instruction, level) ||
-           checkForAll((*targetTree)->right, instruction, level);
+    return checkInAny(targetTree->left, instruction, level) ||
+           checkInAny(targetTree->right, instruction, level);
 }
 
 void checkCommand(Tree *targetTree, struct Instruction instruction) {
@@ -112,20 +112,20 @@ void checkCommand(Tree *targetTree, struct Instruction instruction) {
         return;
     }
     
-    Tree *checkThere;
+    Tree *checkThere = NULL;
     *checkThere = NULL;
 
     if (strcmp(*(instruction.forest), "*") == 0) {
-        if (checkInAny (targetTree, instruction, FOREST)){
+        if (checkInAny (*targetTree, instruction, FOREST)){
             printf("YES\n");
         }
     }
     else if (strcmp(*(instruction.tree), "*") == 0){
-        if (checkInAny((*findTree(*targetTree, instruction.forest))->corresponding, instruction, TREE)) {
+        if (checkInAny((*findTree(*targetTree, *(instruction.forest)))->corresponding, instruction, TREE)) {
             printf("YES\n");
         }
     }
-    else if (*findTree(*targetTree, instruction.forest) != NULL) {
+    else if (*findTree(*targetTree, *(instruction.forest)) != NULL) {
         printf("YES\n");
     }
     else {
@@ -194,7 +194,7 @@ void printCommand(Tree *targetTree, struct Instruction instruction) {
 
 int main() {
     InstructionPtr currentInstruction;
-    Tree *forests;
+    Tree *forests = NULL;
     *forests = NULL;
 
     while(true) {
@@ -223,7 +223,7 @@ int main() {
         deleteInstruction(currentInstruction);
     }
 
-    removeTree(forests);
+    removeTree(*forests);
 
     return 0;
 }

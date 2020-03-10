@@ -1,26 +1,10 @@
 #include <stdlib.h>
 #include "alloc.h"
+#include "instruction.h"
 #include "stringops.h"
 
-const int ERROR = -2;
-const int EOF = -1;
-const int IGNORE = 0;
-const int ADD = 1;
-const int CHECK = 2;
-const int DELETE = 3;
-const int PRINT = 4;
-
-struct Instruction {
-    int command;
-    char **forest;
-    char **tree;
-    char **animal;
-};
-
-typedef struct Instruction* InstructionPtr;
-
 //Instruction constructor. Returns a pointer.
-InstructionPtr createInstruction(int command, char **forest,
+static InstructionPtr createInstruction(int command, char **forest,
                                  char **tree, char **animal) {
     InstructionPtr instructionPtr;
     instructionPtr = (InstructionPtr)malloc(sizeof(struct Instruction));
@@ -43,7 +27,7 @@ void deleteInstruction(InstructionPtr instructionPtr) {
 }
 
 //Returns a number indicating the type of command given by the received string.
-int translateCommandStr(char *commandStr) {
+static int translateCommandStr(char *commandStr) {
     char *add = "ADD";
     char *check = "CHECK";
     char *delete = "DELETE";
@@ -57,7 +41,7 @@ int translateCommandStr(char *commandStr) {
 }
 
 //Returns an InstructionPtr, pointing at an Instruction with only a command.
-InstructionPtr blankInstruction(int command) {
+static InstructionPtr blankInstruction(int command) {
     char **forest;
     char **tree;
     char **animal;
@@ -134,8 +118,4 @@ InstructionPtr parseInstruction() {
     }
 
     return createInstruction(command, forest, tree, animal);
-}
-
-int main() {
-    return 0;
 }

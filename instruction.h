@@ -13,12 +13,13 @@
     #include "stringops.h"
 #endif
 
-extern const int ERROR = -2;
-extern const int IGNORE = 0;
-extern const int ADD = 1;
-extern const int CHECK = 2;
-extern const int DELETE = 3;
-extern const int PRINT = 4;
+#define ERROR -2
+//#define EOF -1
+#define IGNORE 0
+#define ADD 1
+#define CHECK 2
+#define DELETE 3
+#define PRINT 4
 
 struct Instruction {
     int command;
@@ -27,15 +28,13 @@ struct Instruction {
     char **animal;
 };
 
-extern struct Instruction;
-
 typedef struct Instruction* InstructionPtr;
 
 //Instruction destructor.
-extern void deleteInstruction(InstructionPtr);
+void deleteInstruction(InstructionPtr);
 
 //Reads line from stdin and parses it to Instruction. Returns an InstructionPtr.
 //In case of EOF, returns a blank Instruction with EOF command.
-extern InstructionPtr parseInstruction();
+InstructionPtr parseInstruction();
 
-#endif
+#endif /* INSTRUCTION_H */

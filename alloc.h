@@ -6,12 +6,12 @@
 #endif
 
 //Validates if memory has been successfully allocated to a pointer.
-extern void validateAlloc (void *);
+void validateAlloc (void *);
 
 //Allocate memory for a string to a given pointer and validate allocation.
-extern void allocateAndValidateStr(char **, int);
+void allocateAndValidateStr(char **, int);
 
 //Reallocate memory for a string to a certain length and validate allocation.
-extern void reallocateAndValidateStr(char **, int);
+void reallocateAndValidateStr(char **, int);
 
-#endif
+#endif /* ALLOC_H */

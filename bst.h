@@ -13,17 +13,17 @@
     #include "alloc.h"
 #endif
 
+struct Node;
+
+typedef struct Node* Tree;
+
 struct Node {
     char **value;
     Tree corresponding; //for making "Tree of Trees" like structures
     Tree left, right;
 };
 
-extern struct Node;
-
-typedef struct Node* Tree;
-
-extern Tree createTree(char **, Tree, Tree, Tree);
+Tree createTree(char **, Tree, Tree, Tree);
 
 extern Tree *insert(Tree *, char **);
 
@@ -35,4 +35,4 @@ extern void printTree(Tree);
 
 extern Tree *findTree(Tree, char *);
 
-#endif
+#endif /* BST_H */
