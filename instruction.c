@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "alloc.h"
-#include "instruction.h"
 #include "stringops.h"
+#include "instruction.h"
 
 //Instruction constructor. Returns a pointer.
 static InstructionPtr createInstruction(int command, char **forest,

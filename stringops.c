@@ -6,12 +6,12 @@
 
 //Checks if a character is a whitespace.
 static bool isWhitespace(char a) {
-    a == ' ' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
+    return a == ' ' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
 }
 
 //Checks if a character is a letter.
 static bool isLetter(char a) {
-    a > 32 || a < 0;
+    return a > 32 || a < 0;
 }
 
 //Returns a string without whitespaces at the beginning.
