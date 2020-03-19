@@ -1,33 +1,40 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "alloc.h"
 #include "bst.h"
 
-Tree createTree(char** value, Tree corresponding, Tree left, Tree right) {
-    Tree n;
-    n = (Tree)malloc(sizeof(struct Node));
-    validateAlloc(n);
-    n->value = value;
-    n->corresponding = corresponding;
-    n->left = left;
-    n->right = right;
-    return n;
+Tree createTree(char* value, Tree corresponding, Tree left, Tree right) {
+    Tree newTree;
+
+    newTree = (Tree)malloc(sizeof(struct Node));
+    validateAlloc(newTree);
+    
+    newTree->value = value;
+    newTree->corresponding = corresponding;
+    newTree->left = left;
+    newTree->right = right;
+    
+    return newTree;
 }
 
-Tree *insert(Tree *treePtr, char **x) {
-    if (*treePtr == NULL) {
-        *treePtr = createTree(x, NULL, NULL, NULL);
-        return treePtr;
+Tree insertAndFind(Tree *treePtr, char *value, bool *inserted) {
+    Tree t = *treePtr;
+
+    if (t == NULL) {
+        t = createTree(value, NULL, NULL, NULL);
+
+        *treePtr = t;
+        *inserted = true;
+        
+        return *treePtr;
     }
-    else if (strcmp(*(*treePtr)->value, *x) < 0) {
-        return insert(&((*treePtr)->right), x); //krzaczy jak poddrzewo to NULL
+    else if (strcmp(t->value, value) < 0) {
+        return insertAndFind(&t->right, value, inserted);
     }
-    else if (strcmp(*(*treePtr)->value, *x) > 0) {
-        return insert(&((*treePtr)->left), x);
+    else if (strcmp(t->value, value) > 0) {
+        return insertAndFind(&t->left, value, inserted);
     }
     else {
-        return treePtr;
+        *inserted = false;
+
+        return *treePtr;
     }
 }
 
@@ -36,61 +43,71 @@ void removeTree(Tree t) {
         removeTree(t->left);
         removeTree(t->corresponding);
         removeTree(t->right);
-        free(*t->value);
+
+        free(t->value);
         free(t);
     }
 }
 
-static void removeValueAndCorresponding(Tree *t) {
-    if (*t != NULL) {
-        removeTree((*t)->corresponding);
-        free(*((*t)->value));
+// Free the value and corresponding of the root of Tree t from memory.
+static void removeValueAndCorresponding(Tree t) {
+    if (t != NULL) {
+        removeTree(t->corresponding);
+        t->corresponding = NULL;
+
+        free(t->value);
+        t->value = NULL;
     }
 }
 
-static Tree *removeMin(Tree *treePtr) {
-    if (*treePtr == NULL) {
+// Remove the Node with the least value
+// (lexicographically, according to extended ASCII sign values)
+// and return a Tree with this Node as its root
+// (in other words, return a pointer to this Node).
+static Tree removeMin(Tree *treePtr) {
+    Tree t = *treePtr;
+
+    if (t == NULL) {
         return NULL;
     }
     else {
-        if ((*treePtr)->left == NULL) {
-            Tree *prev;
-            *prev = *treePtr;
-            
-            *treePtr = (*treePtr)->right;
-            return prev;
+        if (t->left == NULL) {
+            *treePtr = t->right;
+
+            return t;
         }
         else {
-            return removeMin(&((*treePtr)->left));
+            return removeMin(&t->left);
         }
     }
 }
 
-void removeElement(Tree *treePtr, char *x) {
-    if (*treePtr != NULL) {
-        if (strcmp(*(*treePtr)->value, x) < 0) {
-            removeElement(&((*treePtr)->right), x);
+void removeElement(Tree *treePtr, char *value) {
+    Tree t = *treePtr;
+    if (t != NULL) {
+        if (strcmp(t->value, value) < 0) {
+            removeElement(&t->right, value);
         }
-        else if (strcmp(*(*treePtr)->value, x) > 0) {
-            removeElement(&((*treePtr)->left), x);
+        else if (strcmp(t->value, value) > 0) {
+            removeElement(&t->left, value);
         }
         else {
-            if ((*treePtr)->right == NULL) {
-                Tree *prev = treePtr;
-                *treePtr = (*treePtr)->left;
+            if (t->right == NULL) {
+                *treePtr = t->left;
 
-                removeValueAndCorresponding(prev);
-                free(prev);
+                removeValueAndCorresponding(t);
+                free(t);
             }
             else {
-                Tree *removedMin;
-                removedMin = removeMin(&((*treePtr)->right));
+                Tree removedMin = removeMin(&t->right);
+                
+                removeValueAndCorresponding(t);
+                t->corresponding = removedMin->corresponding;
+                t->value = removedMin->value;
 
-                removeValueAndCorresponding(treePtr);
-                (*treePtr)->value = (*removedMin)->value;
-                (*treePtr)->corresponding = (*removedMin)->corresponding;
-                removeValueAndCorresponding(removedMin);
-                free(*removedMin);
+                free(removedMin);
+
+                *treePtr = t;
             }
         }
     }
@@ -99,22 +116,42 @@ void removeElement(Tree *treePtr, char *x) {
 void printTree(Tree t) {
     if (t != NULL) {
         printTree(t->left);
-        printf("%s\n", *(t->value));
+
+        printf("%s\n", t->value);
+        
         printTree(t->right);
     }
 }
 
-Tree *findTree(Tree t, char *value) {
+Tree findTree(Tree t, char *value) {
     if (t == NULL) {
         return NULL;
     }
 
-    if (strcmp(*(t->value), value) < 0) {
+    if (strcmp(t->value, value) < 0) {
         return findTree(t->right, value);
     }
-    if (strcmp(*(t->value), value) > 0) {
+    else if (strcmp(t->value, value) > 0) {
         return findTree(t->left, value);
     }
-    
-    return &t;
+    else {
+        return t;
+    }
+}
+
+Tree *findTreePtr(Tree *treePtr, char *value) {
+    Tree t = *treePtr;
+    if (t == NULL) {
+        return NULL;
+    }
+
+    if (strcmp(t->value, value) < 0) {
+        return findTreePtr(&t->right, value);
+    }
+    else if (strcmp(t->value, value) > 0) {
+        return findTreePtr(&t->left, value);
+    }
+    else {
+        return treePtr;
+    }
 }

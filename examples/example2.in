@@ -9,3 +9,4 @@ DEL a b c d
 PRINT a b c
 CHECK
 CHECK *
+

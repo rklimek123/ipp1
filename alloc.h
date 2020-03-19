@@ -2,16 +2,17 @@
 #define ALLOC_H
 
 #ifndef _STDLIB_H
-    #include <stdlib.h>
-#endif
+#include <stdlib.h>
+#endif /* _STDLIB_H */
 
-//Validates if memory has been successfully allocated to a pointer.
-void validateAlloc (void *);
 
-//Allocate memory for a string to a given pointer and validate allocation.
-void allocateAndValidateStr(char **, int);
+// Validate if memory has been successfully allocated to a pointer.
+// If not, exit with signal 1.
+static inline void validateAlloc(void *ptr) {
+    if (ptr == NULL) {
+        exit(1);
+    }
+}
 
-//Reallocate memory for a string to a certain length and validate allocation.
-void reallocateAndValidateStr(char **, int);
 
 #endif /* ALLOC_H */

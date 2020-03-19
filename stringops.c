@@ -1,80 +1,80 @@
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include "alloc.h"
 #include "stringops.h"
 
-//Checks if a character is a whitespace.
-static bool isWhitespace(char a) {
-    return a == ' ' || a == '\t' || a == '\v' || a == '\f' || a == '\r';
-}
-
-//Checks if a character is a letter.
+// Check if a character is a letter.
+// 
+// NOTE: A character is a letter if its value in extended ASCII table
+//       is 33 or greater.
 static bool isLetter(char a) {
-    return a > 32 || a < 0;
+    unsigned char ua = (unsigned char)a;
+    return ua > 32;
 }
 
-//Returns a string without whitespaces at the beginning.
-char *removeWhitespaces(char *baseStr) {
-    while (isWhitespace(*baseStr)) {
-        baseStr++;
-        if (baseStr == NULL) return NULL;
-    }
-    return baseStr;
-}
-
-//Adds a char to a string;
-static void addChar(char **targetStr, unsigned long long *targetStrLength,
-             unsigned long long *maxLength, char addedChar) {
-    if (*targetStrLength + 1 == *maxLength) {
+// Append a char to a string.
+// Double the memory allocated for this string if necessary.
+// 
+// targetStr       - the string to which a char is going to be appended
+// targetStrLength - pointer to the current length of the string
+// maxLength       - pointer to the maximum amount of chars in the string,
+//                   including the null terminator '\0'.
+// addedChar       - a char going to be appended
+static void addChar(char *targetStr, size_t *targetStrLength,
+                  size_t *maxLength, char addedChar) {
+    
+    *targetStrLength += 1;
+    
+    if (*targetStrLength + 1 >= *maxLength) {
         *maxLength *= 2;
-        reallocateAndValidateStr(targetStr, *maxLength);
+        targetStr = (char *)realloc(targetStr, *maxLength * sizeof(char));
+        validateAlloc(targetStr);
     }
-    *(*targetStr + *targetStrLength) = addedChar;
+
+    *(targetStr + *targetStrLength - 1) = addedChar;
+    *(targetStr + *targetStrLength) = '\0';
 }
 
-//Returns a string after a word has been removed.
-//The removed word goes to a target location.
 char *removeWord(char *baseStr, char **removedWordLocation) {
-    char *removedWord;
-    unsigned int removedWordLength;
-    unsigned int maxWordLength;
+    char *removedWord = NULL;
 
-    removedWordLength = 0;
-    maxWordLength = 1;
-    allocateAndValidateStr(&removedWord, maxWordLength);
+    size_t removedWordLength = 0;
+    size_t maxWordLength = 1;
+    
+    removedWord = (char *)malloc(maxWordLength * sizeof(char));
+    validateAlloc(removedWord);
+    *removedWord = '\0';
 
     while (isLetter(*baseStr)) {
         addChar(removedWord, &removedWordLength, &maxWordLength, *baseStr);
         baseStr++;
     }
 
-    reallocateAndValidateStr(&removedWord, removedWordLength + 1);
-
-    *(removedWord + removedWordLength) = '\0';
+    removedWord = (char *)realloc(removedWord,
+                                 (removedWordLength + 1) * sizeof(char));
+    validateAlloc(removedWord);
+    
+    free(*removedWordLocation);
     *removedWordLocation = removedWord;
+
     return baseStr;
 }
 
-//Returns pointer to a string with a line, taken from stdin. Ends with '\n'.
-char **readLine() {
-    char *buffer;
-    int bufferLength = 0;
-    int bufferMaxLength = 1;
+// Check if a character is a whitespace.
+// 
+// DISCLAIMER: '\n' isn't considered a whitespace.
+static bool isWhitespace(char a) {
+    return a == ' '  ||
+           a == '\t' ||
+           a == '\v' ||
+           a == '\f' ||
+           a == '\r';
+}
 
-    buffer = (char *)malloc(bufferMaxLength * sizeof(char));
-    validateAlloc(buffer);
-
-    while (scanf("%d", buffer + bufferLength) == 1 &&
-          *(buffer + bufferLength) != '\n') {
-        
-        bufferLength++;
-        
-        if (bufferLength == bufferMaxLength) {
-            bufferMaxLength *= 2;
-            reallocateAndValidateStr(&buffer, bufferMaxLength);
+char *removeWhitespaces(char *baseStr) {
+    while (isWhitespace(*baseStr)) {
+        baseStr++;
+        if (baseStr == NULL) {
+            return NULL;
         }
     }
 
-    return &buffer;
+    return baseStr;
 }

@@ -2,29 +2,35 @@
 #define STRINGOPS_H
 
 #ifndef _STDBOOL_H
-    #include <stdbool.h>
-#endif
+#include <stdbool.h>
+#endif /* _STDBOOL_H */
 
 #ifndef _STDLIB_H
-    #include <stdlib.h>
-#endif
-
-#ifndef _STRING_H
-    #include <string.h>
-#endif
+#include <stdlib.h>
+#endif /* _STDLIB_H */
 
 #ifndef ALLOC_H
-    #include "alloc.h"
-#endif
+#include "alloc.h"
+#endif /* ALLOC_H */
 
-//Returns a string without whitespaces at the beginning.
-char *removeWhitespaces(char *);
 
-//Returns a string after a word has been removed.
-//The removed word goes to a target location.
-char *removeWord(char *, char **);
+// Return a char* similar to baseStr, but without letters at the beginning.
+// The resulting pointer points to the first non-letter sign of baseStr.
+// 
+// Additionally, removedWordLocation becomes a pointer to the removed word.
+// 
+// NOTE: A character is a letter if its value in extended ASCII table
+//       is 33 or greater.
+// 
+// DISCLAIMER: removedWordLocation cannot be a NULL pointer.
+char *removeWord(char *baseStr, char **removedWordLocation);
 
-//Returns pointer to a string with a line, taken from stdin. Ends with '\n'.
-char **readLine();
+
+// Return a char* similar to baseStr, but without whitespaces at the beginning.
+// The resulting pointer points to the first non-whitespace sign of baseStr.
+// 
+// DISCLAIMER: '\n' isn't considered a whitespace.
+char *removeWhitespaces(char *baseStr);
+
 
 #endif /* STRINGOPS_H */

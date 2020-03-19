@@ -1,14 +1,10 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O2
+CFLAGS = -Wall -Wextra -std=c11 -O2 -c
 LDFLAGS =
 
 all: forests
 
-forests: forests.o alloc.o bst.o instruction.o stringops.o
-	$(CC) $(LDFLAGS) -o $@ $^
-
-alloc.o: alloc.c alloc.h
-	$(CC) $(CFLAGS) $<
+.PHONY: all clean
 
 bst.o: bst.c alloc.h bst.h
 	$(CC) $(CFLAGS) $<
@@ -21,6 +17,9 @@ instruction.o: instruction.c alloc.h instruction.h stringops.h
 
 forests.o: forests.c bst.h instruction.h
 	$(CC) $(CFLAGS) $<
+
+forests: forests.o bst.o instruction.o stringops.o
+	$(CC) $(LDFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o forests

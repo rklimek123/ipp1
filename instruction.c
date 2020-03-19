@@ -1,121 +1,139 @@
-#include <stdlib.h>
-#include "alloc.h"
-#include "stringops.h"
 #include "instruction.h"
 
-//Instruction constructor. Returns a pointer.
-static InstructionPtr createInstruction(int command, char **forest,
-                                 char **tree, char **animal) {
-    InstructionPtr instructionPtr;
-    instructionPtr = (InstructionPtr)malloc(sizeof(struct Instruction));
-    validateAlloc(instructionPtr);
+InstructionPtr createInstruction(int command,
+                                char *forest, char *tree, char *animal) {
+                                     
+    InstructionPtr instructionPtr = (InstructionPtr)malloc(sizeof(struct Instruction));
 
     instructionPtr->command = command;
     instructionPtr->forest = forest;
     instructionPtr->tree = tree;
     instructionPtr->animal = animal;
-    
+
     return instructionPtr;
 }
 
-//Instruction destructor.
+void clearInstruction(InstructionPtr instructionPtr, bool clearForest,
+                                       bool clearTree, bool clearAnimal) {
+
+    if(instructionPtr->forest != NULL && clearForest) {
+        free(instructionPtr->forest);
+        instructionPtr->forest = NULL;
+    }
+    if(instructionPtr->tree != NULL && clearTree) {
+        free(instructionPtr->tree);
+        instructionPtr->tree = NULL;
+    }
+    if(instructionPtr->animal != NULL && clearAnimal) {
+        free(instructionPtr->animal);
+        instructionPtr->animal = NULL;
+    }
+}
+
 void deleteInstruction(InstructionPtr instructionPtr) {
-    free(*(instructionPtr->forest));
-    free(*(instructionPtr->tree));
-    free(*(instructionPtr->animal));
+    clearInstruction(instructionPtr, true, true, true);
     free(instructionPtr);
 }
 
-//Returns a number indicating the type of command given by the received string.
+// Return a number indicating the type of command given by the received string.
+// Return ERROR if the commandStr doesn't match any of the commands.
 static int translateCommandStr(char *commandStr) {
-    char *add = "ADD";
-    char *check = "CHECK";
-    char *delete = "DELETE";
-    char *print = "PRINT";
-
-    if (strcmp(commandStr, add) == 0) return ADD;
-    if (strcmp(commandStr, check) == 0) return CHECK;
-    if (strcmp(commandStr, delete) == 0) return DELETE;
-    if (strcmp(commandStr, print) == 0) return PRINT;
+    if (strcmp(commandStr, "ADD") == 0) return ADD;
+    if (strcmp(commandStr, "CHECK") == 0) return CHECK;
+    if (strcmp(commandStr, "DEL") == 0) return DEL;
+    if (strcmp(commandStr, "PRINT") == 0) return PRINT;
     return ERROR;
 }
 
-//Returns an InstructionPtr, pointing at an Instruction with only a command.
-static InstructionPtr blankInstruction(int command) {
-    char **forest;
-    char **tree;
-    char **animal;
-
-    *forest = NULL;
-    *tree = NULL;
-    *animal = NULL;
-
-    return createInstruction(command, forest, tree, animal);
+// Change values in Instruction pointed by instructionPtr, to the ones given
+// by the function's arguments.
+// 
+// WARNING: Doesn't free previously present char* records from memory.
+static void changeInstruction(InstructionPtr instructionPtr, int command,
+                              char *forest, char *tree, char *animal) {
+    
+    instructionPtr->command = command;
+    instructionPtr->forest = forest;
+    instructionPtr->tree = tree;
+    instructionPtr->animal = animal;
 }
 
-//Reads line from stdin and parses it to Instruction. Returns an InstructionPtr.
-//In case of EOF, returns a blank Instruction with EOF command.
-InstructionPtr parseInstruction() {
-    int command;
-    char **commandStr;
-    char **forest;
-    char **tree;
-    char **animal;
-    char **currentLine;
+// Change the Instruction pointed by instructionPtr
+// to have only the given command.
+static void blankInstruction(InstructionPtr instructionPtr, int command) {
+    changeInstruction(instructionPtr, command, NULL, NULL, NULL);
+}
 
-    currentLine = readLine();
-    char *instructionStr = *currentLine;
+void parseInstruction(InstructionPtr instructionPtr, 
+                                char **buffer, size_t *bufferSize) {
+
+    int charsRead = getline(buffer, bufferSize, stdin);
+
+    char *instructionStr = *buffer;
     
-    //returns EOF if nothing has been scanned
+    // return EOF if nothing has been scanned
     if (instructionStr == NULL) {
-        free(currentLine);
-        return blankInstruction(EOF);
+        blankInstruction(instructionPtr, EOF);
+        return;
+    }
+
+    // IGNORE empty lines (e.g. "\n")
+    if (charsRead <= 1) {
+        blankInstruction(instructionPtr, IGNORE);
+        return;
     }
     
-    //ignoring lines starting with a '#'
+    // IGNORE lines starting with a '#'
     if (*instructionStr == '#') {
-        free(currentLine);
-        return blankInstruction(IGNORE);
+        blankInstruction(instructionPtr, IGNORE);
+        return;
     }
 
     instructionStr = removeWhitespaces(instructionStr);
     
-    //ignoring empty or blank lines
+    // IGNORE lines made solely of whitespaces
     if (*instructionStr == '\n') {
-        free(currentLine);
-        return blankInstruction(IGNORE);
+        blankInstruction(instructionPtr, IGNORE);
+        return;
     }
-
-    instructionStr = removeWord(instructionStr, commandStr);
     
-    command = translateCommandStr(*commandStr);
-    free(*commandStr);
+    int command;
+    char *commandStr = (char *)malloc(sizeof(char));
 
-    //returns error immediately if returned to command
+    instructionStr = removeWord(instructionStr, &commandStr);
+    
+    command = translateCommandStr(commandStr);
+    free(commandStr);
+
+    // return ERROR immediately if command is not valid
     if (command == ERROR) {
-        free(currentLine);
-        return blankInstruction(ERROR);
+        blankInstruction(instructionPtr, ERROR);
+        return;
     }
 
-    instructionStr = removeWhitespaces(instructionStr);
-    instructionStr = removeWord(instructionStr, forest);
+    char *forest = (char *)malloc(sizeof(char));
+    char *tree = (char *)malloc(sizeof(char));
+    char *animal = (char *)malloc(sizeof(char));
 
     instructionStr = removeWhitespaces(instructionStr);
-    instructionStr = removeWord(instructionStr, tree);
+    instructionStr = removeWord(instructionStr, &forest);
 
     instructionStr = removeWhitespaces(instructionStr);
-    instructionStr = removeWord(instructionStr, animal);
+    instructionStr = removeWord(instructionStr, &tree);
+
+    instructionStr = removeWhitespaces(instructionStr);
+    instructionStr = removeWord(instructionStr, &animal);
 
     instructionStr = removeWhitespaces(instructionStr);
 
-    //returns error if there are still some signs in a line
+    // return ERROR if there are still some signs in a line
     if (*instructionStr != '\n'){
-        free(*currentLine);
-        free(*forest);//tutaj przypisuje adres gdzies tam a potem usuwam stad lol? moze lepiej jakies kopie? jest chyba na to jakiś modulik. Valgrind poleca
-        free(*tree);
-        free(*animal);
-        return blankInstruction(ERROR);
+        free(forest);
+        free(tree);
+        free(animal);
+        blankInstruction(instructionPtr, ERROR);
+        return;
     }
 
-    return createInstruction(command, forest, tree, animal);
+    changeInstruction(instructionPtr, command, forest, tree, animal);
 }
