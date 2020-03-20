@@ -72,13 +72,13 @@ void parseInstruction(InstructionPtr instructionPtr,
     char *instructionStr = *buffer;
     
     // return EOF if nothing has been scanned
-    if (instructionStr == NULL) {
+    if (charsRead < 1) {
         blankInstruction(instructionPtr, EOF);
         return;
     }
 
     // IGNORE empty lines (e.g. "\n")
-    if (charsRead <= 1) {
+    if (charsRead == 1) {
         blankInstruction(instructionPtr, IGNORE);
         return;
     }
@@ -91,8 +91,9 @@ void parseInstruction(InstructionPtr instructionPtr,
 
     instructionStr = removeWhitespaces(instructionStr);
     
-    // IGNORE lines made solely of whitespaces
-    if (*instructionStr == '\n') {
+    // IGNORE lines made solely of whitespaces,
+    // also when they are at the end of the file.
+    if (*instructionStr == '\n' || *instructionStr == '\0') {
         blankInstruction(instructionPtr, IGNORE);
         return;
     }

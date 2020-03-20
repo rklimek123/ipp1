@@ -12,24 +12,24 @@ static bool isLetter(char a) {
 // Append a char to a string.
 // Double the memory allocated for this string if necessary.
 // 
-// targetStr       - the string to which a char is going to be appended
+// targetStr       - pointer to string to which a char is going to be appended
 // targetStrLength - pointer to the current length of the string
 // maxLength       - pointer to the maximum amount of chars in the string,
 //                   including the null terminator '\0'.
 // addedChar       - a char going to be appended
-static void addChar(char *targetStr, size_t *targetStrLength,
+static void addChar(char **targetStr, size_t *targetStrLength,
                   size_t *maxLength, char addedChar) {
     
     *targetStrLength += 1;
     
     if (*targetStrLength + 1 >= *maxLength) {
         *maxLength *= 2;
-        targetStr = (char *)realloc(targetStr, *maxLength * sizeof(char));
-        validateAlloc(targetStr);
+        *targetStr = (char *)realloc(*targetStr, *maxLength * sizeof(char));
+        validateAlloc(*targetStr);
     }
 
-    *(targetStr + *targetStrLength - 1) = addedChar;
-    *(targetStr + *targetStrLength) = '\0';
+    *(*targetStr + *targetStrLength - 1) = addedChar;
+    *(*targetStr + *targetStrLength) = '\0';
 }
 
 char *removeWord(char *baseStr, char **removedWordLocation) {
@@ -43,7 +43,7 @@ char *removeWord(char *baseStr, char **removedWordLocation) {
     *removedWord = '\0';
 
     while (isLetter(*baseStr)) {
-        addChar(removedWord, &removedWordLength, &maxWordLength, *baseStr);
+        addChar(&removedWord, &removedWordLength, &maxWordLength, *baseStr);
         baseStr++;
     }
 

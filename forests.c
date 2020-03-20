@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include "alloc.h"
 #include "bst.h"
 #include "instruction.h"
 
@@ -454,6 +455,7 @@ int main() {
 
     size_t bufferSize = 32;
     char *buffer = (char *)malloc(bufferSize * sizeof(char));
+    validateAlloc(buffer);
     
     InstructionPtr currentInstruction = createInstruction(IGNORE, NULL, NULL, NULL);
 
